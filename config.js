@@ -1,3 +1,5 @@
-// 🔧 Zdefiniuj stałą PORT. Pamiętaj nadać jej wartość.
+// Zdefiniowanie portu dla serwera
+const PORT = process.env.SERVER_PORT || 3000;
 
-// 🔧 Wyeksportuj PORT, aby inne moduł mogły go używać.
+// Eksport portu dla innych modułów
+module.exports = { PORT };

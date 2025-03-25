@@ -1,16 +1,47 @@
-// 📦 Zaimportuj moduł odpowiedzialne za routing poszczególnych części aplikacji.
-// 📦 Zaimportuj obiekt STATUS_CODE.
+const { homeRouting } = require('./home');
+const { productRouting } = require('./product');
+const { logoutRouting } = require('./logout');
+const { STATUS_CODE } = require('../constants/statusCode');
 
-// 🏗 Stwórz tutaj funkcję 'requestRouting', która będzie obsługiwać zapytania HTTP.
-// Podpowiedź: const requestRouting = (request, response) => {
-// 🏗 Tutaj stwórz logowanie do konsoli informacji, mówiące o typie logowania (INFO), dacie, metodzie oraz url żądania.
-// 🏗 Tutaj stwórz podstawowy 'request routing' dla ścieżek '/', zawierającej /product' oraz '/logout'. Przekaż `request` i `routing` do odpowiednio routingu.
+const requestRouting = async (request, response) => {
+    const { method, url } = request;
+    const timestamp = new Date().toISOString();
 
-// 🏗 Obsłuż specjalny przypadek, jeśli użytkownik zostanie przekierowany na ścieżkę /kill, aplikacja się zamknie.
-// 🏗 Stwórz również logowanie do konsoli informacji, mówiące o typie logowania (PROCESS), dacie oraz informację, że wylogowowyanie zostało wywołane a aplikacja zamknie się.
+    console.log(`INFO [${timestamp}]: ${method} - ${url}`);
 
-// 🏗 Tutaj stwórz obsługę przypadku, jeśli żądany URL nie istnieje. Zwróć wtedy błąd 404.
-// 🏗 Stwórz również logowanie do konsoli informacji, mówiące o typie logowania (ERROR), dacie oraz informację, że żądany url nie istnieje.
-//  };
+    try {
+        if (url === '/') {
+            homeRouting(method, response);
+        } else if (url.startsWith('/product')) {
+            await productRouting(method, url, request, response);
+        } else if (url === '/logout') {
+            logoutRouting(method, response);
+        } else if (url === '/kill') {
+            console.log(`PROCES [${timestamp}]: wylogowanie zostało zainicjowane, aplikacja zostanie zamknięta`);
+            process.exit(0);
+        } else {
+            console.log(`BŁĄD [${timestamp}]: żądany adres URL ${url} nie istnieje`);
+            
+            response.statusCode = STATUS_CODE.NOT_FOUND;
+            response.setHeader("Content-Type", "text/html; charset=utf-8");
+            response.end(`
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Błąd 404</title>
+</head>
+<body>
+    <h1>404 Nie znaleziono</h1>
+    <p>Żądany adres URL ${url} nie został znaleziony na serwerze.</p>
+</body>
+</html>`);
+        }
+    } catch (error) {
+        console.error(`BŁĄD [${timestamp}]: ${error.message}`);
+        response.statusCode = 500;
+        response.end('Wystąpił błąd serwera');
+    }
+};
 
-// 🔧 Wyeksportuj funkcję 'requestRouting', aby inne moduł mogły jej używać.
+module.exports = { requestRouting };

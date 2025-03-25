@@ -1,7 +1,24 @@
-// 🏗 Stwórz funkcję 'logoutRouting', która obsłuży stronę wylogowania.
-// 🏗 Ustaw odpowiedni nagłówek 'Content-Type'.
-// Podpowiedź: response.setHeader("Content-Type", "text/html");
-// 🏗 Zakończ odpowiedź HTTP po wyrenderowaniu strony.
-// Podpowiedź: return response.end();
+const logoutRouting = (method, response) => {
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    
+    const logoutPageHtml = `
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop – Logout</title>
+</head>
+<body>
+    <h1>Logout</h1>
+    <nav>
+        <a href="/">Strona główna</a>
+        <a href="/kill">Zamknij aplikację</a>
+    </nav>
+</body>
+</html>`;
 
-// 🔧 Wyeksportuj funkcję 'logoutRouting', aby inne moduł mogły jej używać.
+    response.statusCode = 200;
+    response.end(logoutPageHtml);
+};
+
+module.exports = { logoutRouting };
